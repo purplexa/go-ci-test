@@ -1,4 +1,4 @@
-module github.com/purplexa/go-cli-test
+module github.com/purplexa/go-ci-test
 
 go 1.18
 
