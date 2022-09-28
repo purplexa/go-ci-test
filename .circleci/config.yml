@@ -80,7 +80,7 @@ jobs:
   build-ui:
     working_directory: ~/repo/ui
     docker:
-      - image: cimg/node:18.10.0
+      - image: cimg/node:18.9.1
     steps:
       - checkout
       - restore_cache:
