@@ -5,7 +5,7 @@ version: 2.1
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
 jobs:
-  test:
+  test-server:
     working_directory: ~/repo
     # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
     # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
@@ -26,13 +26,13 @@ jobs:
           paths:
             - "/go/pkg/mod"
       - run:
-          name: Run tests
+          name: Run Tests
           command: |
             mkdir -p /tmp/test-reports
             gotestsum --junitfile /tmp/test-reports/unit-tests.xml
       - store_test_results:
           path: /tmp/test-reports
-  build:
+  build-server:
     working_directory: ~/repo
     # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
     # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
@@ -58,6 +58,50 @@ jobs:
       - store_artifacts:
           path: ~/repo/go-ci-test
           destination: server-binary
+  test-ui:
+    working_directory: ~/repo/ui
+    docker:
+      - image: cimg/node:18.10.0
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - npm-pkg-{{ checksum "package-lock.json" }}
+      - run:
+          name: Install Dependencies
+          command: npm install --no-save
+      - save_cache:
+          key: npm-pkg-{{ checksum "package-lock.json" }}
+          paths:
+            - "~/repo/ui/node_modules"
+      - run:
+          name: Run Tests
+          command: npm test
+  build-ui:
+    working_directory: ~/repo/ui
+    docker:
+      - image: cimg/node:18.10.0
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - npm-pkg-{{ checksum "package-lock.json" }}
+      - run:
+          name: Install Dependencies
+          command: npm install --no-save
+      - save_cache:
+          key: npm-pkg-{{ checksum "package-lock.json" }}
+          paths:
+            - "~/repo/ui/node_modules"
+      - run:
+          name: Build Bundle
+          command: npm run build
+      - run:
+          name: Create Archive
+          command: tar czvf ui.tar.gz build
+      - store_artifacts:
+          path: ~/repo/ui/ui.tar.gz
+          destination: ui.tar.gz
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
@@ -65,5 +109,9 @@ workflows:
   server: # This is the name of the workflow, feel free to change it to better match your workflow.
     # Inside the workflow, you define the jobs you want to run.
     jobs:
-      - test
-      - build
+      - test-server
+      - build-server
+  ui:
+    jobs:
+      - test-ui
+      - build-ui
