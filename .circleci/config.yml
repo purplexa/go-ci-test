@@ -64,6 +64,7 @@ jobs:
       - image: cimg/node:18.9.1
     steps:
       - checkout:
+          path: ~/repo
       - restore_cache:
           keys:
             - npm-pkg-{{ checksum "package-lock.json" }}
