@@ -66,12 +66,12 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - npm-pkg-{{ checksum "package-lock.json" }}
+            - npm-pkg-{{ checksum "package.json" }}
       - run:
           name: Install Dependencies
           command: npm install --no-save
       - save_cache:
-          key: npm-pkg-{{ checksum "package-lock.json" }}
+          key: npm-pkg-{{ checksum "package.json" }}
           paths:
             - "~/repo/ui/node_modules"
       - run:
@@ -85,12 +85,12 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - npm-pkg-{{ checksum "package-lock.json" }}
+            - npm-pkg-{{ checksum "package.json" }}
       - run:
           name: Install Dependencies
           command: npm install --no-save
       - save_cache:
-          key: npm-pkg-{{ checksum "package-lock.json" }}
+          key: npm-pkg-{{ checksum "package.json" }}
           paths:
             - "~/repo/ui/node_modules"
       - run:
