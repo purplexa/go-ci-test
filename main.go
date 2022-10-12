@@ -54,7 +54,7 @@ func (d *Data) findUserYoungerThan(age int) []User {
 	list := make([]User, 0)
 	for _, e := range d.users {
 		time.Sleep(time.Millisecond * 100)
-		if e.age < age {
+		if e.age > age {
 			list = append(list, e)
 		}
 	}
